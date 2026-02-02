@@ -1,27 +1,26 @@
 import { useEffect, useRef, useCallback } from 'react';
 
-// interface Particle {
-  x= ['#3fb950', '#58a6ff', '#39c5cf', '#a371f7', '#d29922'];
+const colors = ['#3fb950', '#58a6ff', '#39c5cf', '#a371f7', '#d29922'];
 
-export default function ParticleField({ 
+export default function ParticleField({
   particleCount = 60,
   connectionDistance = 120,
   mouseRadius = 150
 }) {
   const canvasRef = useRef(null);
   const particlesRef = useRef([]);
-  const mouseRef = useRef({ x);
-  const animationRef = useRef | null>(null);
+  const mouseRef = useRef({ x: -9999, y: -9999 });
+  const animationRef = useRef(null);
 
-  const initParticles = useCallback((width) => {
-    particlesRef.current = Array.from({ length) => ({
-      x) * width,
-      y) * height,
-      vx) - 0.5) * 0.5,
-      vy) - 0.5) * 0.5,
-      size) * 2 + 1,
-      color) * colors.length)],
-      alpha) * 0.5 + 0.3
+  const initParticles = useCallback((width, height) => {
+    particlesRef.current = Array.from({ length: particleCount }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.5,
+      vy: (Math.random() - 0.5) * 0.5,
+      size: Math.random() * 2 + 1,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      alpha: Math.random() * 0.5 + 0.3
     }));
   }, [particleCount]);
 
@@ -39,8 +38,14 @@ export default function ParticleField({
     };
 
     const handleMouseMove = (e) => {
-      mouseRef.current = { x, y= () => {
-      mouseRef.current = { x, y);
+      mouseRef.current = { x: e.clientX, y: e.clientY };
+    };
+
+    const handleMouseLeave = () => {
+      mouseRef.current = { x: -9999, y: -9999 };
+    };
+
+    handleResize();
     window.addEventListener('resize', handleResize);
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseleave', handleMouseLeave);
@@ -125,4 +130,3 @@ export default function ParticleField({
     />
   );
 }
-
