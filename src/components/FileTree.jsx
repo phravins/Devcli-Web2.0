@@ -1,72 +1,71 @@
 import { useState } from 'react';
-import { 
-  Folder, 
-  FolderOpen, 
-  FileCode, 
-  FileJson, 
-  FileText, 
-  FileType, 
-  ChevronRight, 
+import {
+  Folder,
+  FolderOpen,
+  FileCode,
+  FileJson,
+  FileText,
+  FileType,
+  ChevronRight,
   ChevronDown,
-  File
 } from 'lucide-react';
 
-// interface FileNode {
-  name= [
+const fileTreeData = [
   {
-    name,
-    type,
-    isOpen,
-    children,
-        type,
-        isOpen,
-        children, type, language,
-          { name, type, children, type, language,
-            { name, type, language,
-          ]},
-          { name, type, children, type, language,
-            { name, type, language,
-          ]},
+    name: 'src',
+    type: 'folder',
+    isOpen: true,
+    children: [
+      {
+        name: 'components',
+        type: 'folder',
+        isOpen: true,
+        children: [
+          { name: 'App.jsx', type: 'file', language: 'javascript' },
+          { name: 'FileTree.jsx', type: 'file', language: 'javascript' },
+          { name: 'MatrixRain.jsx', type: 'file', language: 'javascript' },
         ]
       },
       {
-        name,
-        type,
-        children, type, language,
+        name: 'sections',
+        type: 'folder',
+        isOpen: false,
+        children: [
+          { name: 'Hero.jsx', type: 'file', language: 'javascript' },
+          { name: 'Features.jsx', type: 'file', language: 'javascript' },
+          { name: 'Commands.jsx', type: 'file', language: 'javascript' },
         ]
       },
       {
-        name,
-        type,
-        children, type, language,
-          { name, type, language,
-        ]
+        name: 'App.css',
+        type: 'file',
+        language: 'css'
       },
       {
-        name,
-        type,
-        children, type, language,
-          { name, type, language,
-        ]
+        name: 'index.html',
+        type: 'file',
+        language: 'html'
       },
-      { name, type, language,
-      { name, type, language,
-      { name, type, language,
-      { name, type, language,
-      { name, type, language,
-      { name, type, language,
+      { name: 'package.json', type: 'file', language: 'json' },
+      { name: 'vite.config.js', type: 'file', language: 'javascript' },
+      { name: 'README.md', type: 'file', language: 'markdown' },
     ]
   }
 ];
 
 const getFileIcon = (node) => {
   if (node.type === 'folder') {
-    return node.isOpen ? FolderOpen= node.name.split('.').pop()?.toLowerCase();
-  
+    return node.isOpen ? FolderOpen : Folder;
+  }
+
+  const ext = node.name.split('.').pop()?.toLowerCase();
+
   switch (ext) {
     case 'go':
     case 'js':
+    case 'jsx':
     case 'ts':
+    case 'tsx':
     case 'py':
     case 'rs':
       return FileCode;
@@ -78,18 +77,25 @@ const getFileIcon = (node) => {
     case 'yaml':
     case 'yml':
       return FileType;
-    default= (node) => {
+    default:
+      return FileText;
+  }
+};
+
+const getFileColor = (node) => {
   if (node.type === 'folder') {
     return node.isOpen ? 'text-terminal-blue' : 'text-terminal-yellow';
   }
-  
+
   const ext = node.name.split('.').pop()?.toLowerCase();
-  
+
   switch (ext) {
     case 'go':
       return 'text-terminal-cyan';
     case 'js':
+    case 'jsx':
     case 'ts':
+    case 'tsx':
       return 'text-terminal-yellow';
     case 'py':
       return 'text-terminal-blue';
@@ -105,12 +111,16 @@ const getFileIcon = (node) => {
       return 'text-terminal-blue';
     case 'makefile':
       return 'text-terminal-red';
-    default) => void;
-  path, depth, onToggle, path }) {
-  const Icon = getFileIcon(node);
+    default:
+      return 'text-terminal-text-dim';
+  }
+};
+
+function FileTreeNode({ node, depth, onToggle, path }) {
+  const NodeIcon = getFileIcon(node);
   const colorClass = getFileColor(node);
   const currentPath = [...path, node.name];
-  
+
   const handleClick = () => {
     if (node.type === 'folder') {
       onToggle(currentPath);
@@ -121,16 +131,23 @@ const getFileIcon = (node) => {
     <div>
       <button
         onClick={handleClick}
-        className={`flex items-center gap-2 w-full py-1 px-2 hover)}
-        {node.type === 'file' && <span className="w-4" />}
-        <Icon className={`w-4 h-4 ${colorClass}`} />
-        <span className={`text-sm ${node.type === 'folder' ? 'font-medium' : ''} text-terminal-text`}>
-          {node.name}
-        </span>
+        className="flex items-center gap-2 w-full py-1 px-2 hover:bg-terminal-bg-light rounded transition-colors group text-left"
+        style={{ paddingLeft: `${depth * 16 + 8}px` }}
+      >
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          {node.type === 'folder' && (
+            node.isOpen ? <ChevronDown className="w-3 h-3 text-terminal-text-dim" /> : <ChevronRight className="w-3 h-3 text-terminal-text-dim" />
+          )}
+          {node.type === 'file' && <div className="w-3" />}
+          <NodeIcon className={`w-4 h-4 flex-shrink-0 ${colorClass}`} />
+          <span className={`text-sm truncate ${node.type === 'folder' ? 'font-medium' : ''} text-terminal-text`}>
+            {node.name}
+          </span>
+        </div>
       </button>
-      
+
       {node.type === 'folder' && node.isOpen && node.children && (
-        <div>
+        <div className="mt-0.5">
           {node.children.map((child, index) => (
             <FileTreeNode
               key={child.name + index}
@@ -146,17 +163,13 @@ const getFileIcon = (node) => {
   );
 }
 
-// interface FileTreeProps {
-  onFileSelect?: (file) => void;
-}
-
-export default function FileTree(_props) {
+export default function FileTree() {
   const [tree, setTree] = useState(fileTreeData);
 
   const toggleFolder = (targetPath) => {
-    const newTree = [...tree];
-    
-    const toggleNode = (nodes) => {
+    const newTree = JSON.parse(JSON.stringify(tree));
+
+    const findAndToggle = (nodes, path, depth) => {
       for (const node of nodes) {
         if (node.name === path[depth]) {
           if (depth === path.length - 1) {
@@ -164,19 +177,19 @@ export default function FileTree(_props) {
             return true;
           }
           if (node.children) {
-            return toggleNode(node.children, path, depth + 1);
+            return findAndToggle(node.children, path, depth + 1);
           }
         }
       }
       return false;
     };
-    
-    toggleNode(newTree, targetPath, 0);
+
+    findAndToggle(newTree, targetPath, 0);
     setTree(newTree);
   };
 
   return (
-    <div className="terminal-window">
+    <div className="terminal-window h-full">
       <div className="terminal-header">
         <div className="terminal-dot terminal-dot-red" />
         <div className="terminal-dot terminal-dot-yellow" />
@@ -187,16 +200,16 @@ export default function FileTree(_props) {
         </span>
       </div>
 
-      <div className="terminal-body p-0">
+      <div className="terminal-body p-0 flex flex-col h-[500px]">
         {/* Breadcrumb */}
-        <div className="px-4 py-2 border-b border-terminal-border bg-terminal-bg-light flex items-center gap-2 text-sm">
+        <div className="px-4 py-2 border-b border-terminal-border bg-terminal-bg-light flex items-center gap-2 text-sm flex-shrink-0">
           <span className="text-terminal-text-dim">~/projects</span>
           <span className="text-terminal-text-dim">/</span>
           <span className="text-terminal-green">my-project</span>
         </div>
 
         {/* File Tree */}
-        <div className="p-2 max-h-[400px] overflow-y-auto">
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
           {tree.map((node, index) => (
             <FileTreeNode
               key={node.name + index}
@@ -209,7 +222,7 @@ export default function FileTree(_props) {
         </div>
 
         {/* File Stats */}
-        <div className="px-4 py-2 border-t border-terminal-border bg-terminal-bg-light text-xs text-terminal-text-dim flex items-center justify-between">
+        <div className="px-4 py-2 border-t border-terminal-border bg-terminal-bg-light text-xs text-terminal-text-dim flex items-center justify-between flex-shrink-0">
           <span>14 files, 5 folders</span>
           <span>Go Module</span>
         </div>
@@ -217,4 +230,3 @@ export default function FileTree(_props) {
     </div>
   );
 }
-

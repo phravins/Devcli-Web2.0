@@ -1,51 +1,26 @@
 import { useEffect, useState } from 'react';
 import { Terminal } from 'lucide-react';
 
-// interface LoadingScreenProps {
-  onComplete) => void;
-}
-
 const bootSequence = [
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
-  { text, delay,
+  { text: 'Starting DevCLI Boot Sequence...', delay: 100 },
+  { text: 'Loading kernel modules...', delay: 400 },
+  { text: '[OK] Kernel initialized.', delay: 200 },
+  { text: 'Mounting virtual file system...', delay: 300 },
+  { text: '[OK] VFS mounted at /', delay: 100 },
+  { text: 'Starting network subsystems...', delay: 500 },
+  { text: '[OK] Network ready.', delay: 100 },
+  { text: 'Initializing AI core...', delay: 600 },
+  { text: '[OK] AI core online.', delay: 100 },
+  { text: 'Loading terminal UI components...', delay: 400 },
+  { text: 'Checking for updates...', delay: 300 },
+  { text: '[OK] System up to date.', delay: 200 },
+  { text: '', delay: 100 },
+  { text: '╔══════════════════════════════════════════╗', delay: 50 },
+  { text: '║           DevCLI v2.4.1 (Stable)         ║', delay: 50 },
+  { text: '╚══════════════════════════════════════════╝', delay: 50 },
+  { text: '', delay: 100 },
+  { text: 'Login successful: developer', delay: 200 },
+  { text: 'Initializing interactive shell...', delay: 300 },
 ];
 
 export default function LoadingScreen({ onComplete }) {
@@ -55,12 +30,12 @@ export default function LoadingScreen({ onComplete }) {
 
   useEffect(() => {
     if (currentLine >= bootSequence.length) {
-      setTimeout(onComplete, 500);
-      return;
+      const timer = setTimeout(onComplete, 800);
+      return () => clearTimeout(timer);
     }
 
     const { text, delay } = bootSequence[currentLine];
-    
+
     const timer = setTimeout(() => {
       setLines(prev => [...prev, text]);
       setCurrentLine(prev => prev + 1);
@@ -80,7 +55,6 @@ export default function LoadingScreen({ onComplete }) {
   return (
     <div className="fixed inset-0 bg-terminal-bg z-[200] flex items-center justify-center p-8">
       <div className="max-w-3xl w-full">
-        {/* Terminal Window */}
         <div className="terminal-window">
           <div className="terminal-header">
             <div className="flex gap-2">
@@ -93,22 +67,21 @@ export default function LoadingScreen({ onComplete }) {
               System Boot
             </span>
           </div>
-          
+
           <div className="terminal-body font-mono text-sm min-h-[400px]">
             {lines.map((line, i) => (
-              <div 
-                key={i} 
-                className={`${
-                  line.startsWith('[OK]') ? 'text-terminal-green' :
-                  line.startsWith('╔') || line.startsWith('║') || line.startsWith('╚') ? 'text-terminal-green-bright' :
-                  line.includes('DevCLI') && line.includes('v2') ? 'text-terminal-yellow' :
-                  'text-terminal-text'
-                }`}
+              <div
+                key={i}
+                className={`${line.startsWith('[OK]') ? 'text-terminal-green' :
+                    line.startsWith('╔') || line.startsWith('║') || line.startsWith('╚') ? 'text-terminal-green-bright' :
+                      line.includes('DevCLI') && line.includes('v2') ? 'text-terminal-yellow' :
+                        'text-terminal-text'
+                  }`}
               >
                 {line}
               </div>
             ))}
-            
+
             {/* Progress Bar */}
             {currentLine > 0 && currentLine < bootSequence.length && (
               <div className="mt-4">
@@ -116,15 +89,15 @@ export default function LoadingScreen({ onComplete }) {
                   <span>Loading...</span>
                   <span>{Math.round((currentLine / bootSequence.length) * 100)}%</span>
                 </div>
-                <div className="terminal-progress">
-                  <div 
-                    className="terminal-progress-bar transition-all duration-300"
-                    style={{ width) * 100}%` }}
+                <div className="w-full bg-terminal-bg-light h-1.5 rounded-full overflow-hidden border border-terminal-border">
+                  <div
+                    className="bg-terminal-green h-full transition-all duration-300 shadow-[0_0_10px_rgba(63,185,80,0.5)]"
+                    style={{ width: `${(currentLine / bootSequence.length) * 100}%` }}
                   />
                 </div>
               </div>
             )}
-            
+
             {/* Cursor */}
             {showCursor && currentLine < bootSequence.length && (
               <span className="text-terminal-green">█</span>
@@ -135,6 +108,11 @@ export default function LoadingScreen({ onComplete }) {
         {/* Skip Button */}
         <button
           onClick={onComplete}
-          className="mt-4 mx-auto block text-terminal-text-dim hover);
+          className="mt-4 mx-auto block text-terminal-text-dim hover:text-terminal-text text-sm transition-colors"
+        >
+          Press ESC or click to skip boot sequence
+        </button>
+      </div>
+    </div>
+  );
 }
-

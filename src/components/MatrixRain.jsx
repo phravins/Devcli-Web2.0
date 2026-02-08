@@ -1,32 +1,25 @@
 import { useEffect, useRef, useCallback } from 'react';
 
-// interface MatrixRainProps {
-  opacity?: number;
-  speed?: number;
-  density?: number;
-  color?: string;
-}
-
-export default function MatrixRain({ 
-  opacity = 0.15, 
+export default function MatrixRain({
+  opacity = 0.15,
   speed = 1,
   density = 0.95,
   color = '#3fb950'
 }) {
   const canvasRef = useRef(null);
-  const animationRef = useRef | null>(null);
+  const animationRef = useRef(null);
   const dropsRef = useRef([]);
   const charsRef = useRef([]);
 
   const initMatrix = useCallback((canvas) => {
     const fontSize = 14;
     const columns = Math.floor(canvas.width / fontSize);
-    
+
     // Initialize drops at random positions
-    dropsRef.current = Array(columns).fill(0).map(() => 
+    dropsRef.current = Array(columns).fill(0).map(() =>
       Math.random() * -100 // Start above screen at random heights
     );
-    
+
     // Generate character set (mix of code-related symbols)
     const codeChars = '01{}[]()<>/\\|;:\'"`~!@#$%^&*+-=_.?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
     const japaneseChars = 'ｦｱｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ';
@@ -54,7 +47,7 @@ export default function MatrixRain({
 
     const draw = () => {
       frameCount++;
-      
+
       // Control speed by skipping frames
       if (frameCount % Math.max(1, Math.floor(3 / speed)) !== 0) {
         animationRef.current = requestAnimationFrame(draw);
@@ -116,4 +109,3 @@ export default function MatrixRain({
     />
   );
 }
-

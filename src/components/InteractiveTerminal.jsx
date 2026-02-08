@@ -1,57 +1,89 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Terminal, Maximize2, Minimize2 } from 'lucide-react';
+import { Terminal, Maximize2, Minimize2, X, ChevronRight } from 'lucide-react';
 
-// interface Command {
-  input= {
+const fileSystem = {
   '/': {
-    type,
-    children, 'projects', 'docs', '.config']
+    type: 'dir',
+    children: ['home', 'projects', 'docs', '.config']
   },
   '/home': {
-    type,
-    children,
+    type: 'dir',
+    children: ['user']
+  },
   '/home/user': {
-    type,
-    children, 'downloads', '.devcli']
+    type: 'dir',
+    children: ['projects', 'downloads', '.devcli']
   },
   '/home/user/projects': {
-    type,
-    children, 'api-server', 'cli-tool']
+    type: 'dir',
+    children: ['api-server', 'cli-tool', 'my-app']
   },
   '/home/user/projects/my-app': {
-    type,
-    children, 'package.json', 'README.md']
+    type: 'dir',
+    children: ['src', 'package.json', 'README.md']
   },
   '/home/user/projects/my-app/src': {
-    type,
-    children, 'App.tsx']
+    type: 'dir',
+    children: ['App.jsx', 'index.css']
   },
   '/projects': {
-    type,
-    children, 'contributions']
+    type: 'dir',
+    children: ['contributions']
   },
   '/docs': {
-    type,
-    children, 'CONTRIBUTING.md']
+    type: 'dir',
+    children: ['README.md', 'CONTRIBUTING.md']
   },
   '/docs/README.md': {
-    type,
-    content,
+    type: 'file',
+    content: ['# DevCLI Documentation', '', 'DevCLI is a next-generation terminal interface for developers.']
+  },
   '/docs/CONTRIBUTING.md': {
-    type,
-    content, (args) => { output= {
-  help) => ({
-    output),
-  clear) => ({ output),
-  ls, cwd) => {
+    type: 'file',
+    content: ['# Contributing Guide', '', 'Please read our contributing guidelines before submitting a PR.']
+  }
+};
+
+const resolvePath = (path, cwd) => {
+  if (path.startsWith('/')) return path;
+  if (path === '.') return cwd;
+  if (path === '..') {
+    const parts = cwd.split('/').filter(Boolean);
+    parts.pop();
+    return '/' + parts.join('/');
+  }
+  return `${cwd}/${path}`.replace(/\/+/g, '/').replace(/\/$/, '') || '/';
+};
+
+const availableCommands = {
+  help: () => ({
+    output: [
+      'Available commands:',
+      '  help      - Show this help message',
+      '  ls [path] - List directory contents',
+      '  cd [path] - Change current directory',
+      '  pwd       - Show current directory',
+      '  cat [file]- Show file content',
+      '  clear     - Clear terminal history',
+      '  echo [msg]- Echo a message',
+      '  whoami    - Show current user',
+      '  date      - Show current date',
+      '  devcli    - DevCLI system utility',
+    ]
+  }),
+  clear: () => ({ output: ['__CLEAR__'] }),
+  ls: (args, cwd) => {
     const path = args[0] ? resolvePath(args[0], cwd) : cwd;
     const entry = fileSystem[path];
-    
+
     if (!entry) {
-      return { output, isError=== 'file') {
-      return { output).pop() || ''] };
+      return { output: [`ls: ${args[0]}: No such file or directory`], isError: true };
     }
-    
+
+    if (entry.type === 'file') {
+      return { output: [args[0]] };
+    }
+
     const children = entry.children || [];
     const output = children.map(child => {
       const childPath = `${path}/${child}`.replace(/\/+/g, '/');
@@ -64,75 +96,74 @@ import { Terminal, Maximize2, Minimize2 } from 'lucide-react';
       }
       return child;
     });
-    
-    return { output)'] };
+
+    return { output: [output.join('  ')] };
   },
-  cd, cwd) => {
+  cd: (args, cwd) => {
     if (!args[0] || args[0] === '~') {
-      return { output, newCwd= resolvePath(args[0], cwd);
+      return { output: [], newCwd: '/home/user' };
+    }
+    const newPath = resolvePath(args[0], cwd);
     const entry = fileSystem[newPath];
-    
+
     if (!entry) {
-      return { output, isError=== 'file') {
-      return { output, isError, newCwd,
-  pwd, cwd) => ({ output),
-  cat, cwd) => {
-    if (!args[0]) {
-      return { output, isError= resolvePath(args[0], cwd);
-    const entry = fileSystem[path];
-    
-    if (!entry) {
-      return { output, isError=== 'dir') {
-      return { output, isError) || ['(empty file)'] };
+      return { output: [`cd: ${args[0]}: No such file or directory`], isError: true };
+    }
+    if (entry.type === 'file') {
+      return { output: [`cd: ${args[0]}: Not a directory`], isError: true };
+    }
+    return { output: [], newCwd: newPath };
   },
-  echo) => ({ output)] }),
-  whoami) => ({ output),
-  date) => ({ output).toString()] }),
-  devcli) => {
+  pwd: (args, cwd) => ({ output: [cwd] }),
+  cat: (args, cwd) => {
+    if (!args[0]) {
+      return { output: ['usage: cat [file]'], isError: true };
+    }
+    const path = resolvePath(args[0], cwd);
+    const entry = fileSystem[path];
+
+    if (!entry) {
+      return { output: [`cat: ${args[0]}: No such file or directory`], isError: true };
+    }
+    if (entry.type === 'dir') {
+      return { output: [`cat: ${args[0]}: Is a directory`], isError: true };
+    }
+    return { output: entry.content || ['(empty file)'] };
+  },
+  echo: (args) => ({ output: [args.join(' ')] }),
+  whoami: () => ({ output: ['developer'] }),
+  date: () => ({ output: [new Date().toString()] }),
+  devcli: (args) => {
     if (args.includes('--version') || args.includes('-v')) {
-      return { output)', 'Built with Go 1.21.5 + Bubble Tea'] };
+      return { output: ['devcli version 2.4.1 (linux/amd64)', 'Built with React 19 + Vite'] };
     }
     if (args.includes('--help') || args.includes('-h')) {
       return {
-        output,
+        output: [
+          'DevCLI - Modern Developers Utility',
           '',
-          'Usage,
+          'Usage: devcli [command] [options]',
           '',
-          'Commands,
+          'Commands:',
           '  project    Manage projects',
           '  run        Run tasks',
           '  env        Environment management',
           '  serve      Development server',
-          '  create     Create files from templates',
-          '  gen        Generate code',
-          '  snippet    Snippet library',
-          '  ai         AI assistant',
-          '  files      File manager',
-          '  update     Update system',
           '',
-          'Options,
+          'Options:',
           '  -h, --help     Show help',
-          '  -v, --version  Show version',
-          '',
-          'Run "devcli <command> --help" for more info.'
+          '  -v, --version  Show version'
         ]
       };
     }
-    return { output): string {
-  if (path.startsWith('/')) return path;
-  if (path === '.') return cwd;
-  if (path === '..') {
-    const parts = cwd.split('/').filter(Boolean);
-    parts.pop();
-    return '/' + parts.join('/');
+    return { output: ['Usage: devcli [command] [options]. See "devcli --help" for info.'] };
   }
-  return `${cwd}/${path}`.replace(/\/+/g, '/');
-}
+};
 
-function parseAnsi() {
+const parseAnsi = (text) => {
   const parts = text.split(/(\x1b\[\d+m)/g);
   let currentColor = '';
-  
+
   return (
     <>
       {parts.map((part, i) => {
@@ -145,7 +176,7 @@ function parseAnsi() {
             case '31': currentColor = 'text-terminal-red'; break;
             case '33': currentColor = 'text-terminal-yellow'; break;
             case '0': currentColor = ''; break;
-            default= '';
+            default: currentColor = '';
           }
           return null;
         }
@@ -153,11 +184,7 @@ function parseAnsi() {
       })}
     </>
   );
-}
-
-// interface InteractiveTerminalProps {
-  isOpen) => void;
-}
+};
 
 export default function InteractiveTerminal({ isOpen, onClose }) {
   const [history, setHistory] = useState([]);
@@ -189,19 +216,28 @@ export default function InteractiveTerminal({ isOpen, onClose }) {
 
     if (handler) {
       const result = handler(args, cwd);
-      
+
       if (result.output[0] === '__CLEAR__') {
         setHistory([]);
       } else {
-        setHistory(prev => [...prev, { input);
+        setHistory(prev => [...prev, {
+          input: cmdInput,
+          output: result.output,
+          isError: result.isError,
+          cwd: cwd
+        }]);
       }
-      
+
       if (result.newCwd) {
         setCwd(result.newCwd);
       }
     } else {
-      setHistory(prev => [...prev, { 
-        input);
+      setHistory(prev => [...prev, {
+        input: cmdInput,
+        output: [`Command not found: ${cmd}. Type 'help' for assistance.`],
+        isError: true,
+        cwd: cwd
+      }]);
     }
   }, [cwd]);
 
@@ -215,7 +251,7 @@ export default function InteractiveTerminal({ isOpen, onClose }) {
   const handleKeyDown = (e) => {
     if (e.key === 'ArrowUp') {
       e.preventDefault();
-      const commands = history.filter(h => !h.isError).map(h => h.input);
+      const commands = history.map(h => h.input);
       if (historyIndex < commands.length - 1) {
         const newIndex = historyIndex + 1;
         setHistoryIndex(newIndex);
@@ -226,7 +262,7 @@ export default function InteractiveTerminal({ isOpen, onClose }) {
       if (historyIndex > 0) {
         const newIndex = historyIndex - 1;
         setHistoryIndex(newIndex);
-        const commands = history.filter(h => !h.isError).map(h => h.input);
+        const commands = history.map(h => h.input);
         setInput(commands[commands.length - 1 - newIndex]);
       } else if (historyIndex === 0) {
         setHistoryIndex(-1);
@@ -234,7 +270,6 @@ export default function InteractiveTerminal({ isOpen, onClose }) {
       }
     } else if (e.key === 'Tab') {
       e.preventDefault();
-      // Simple tab completion
       const partial = input.trim();
       const commands = Object.keys(availableCommands);
       const match = commands.find(cmd => cmd.startsWith(partial));
@@ -250,42 +285,71 @@ export default function InteractiveTerminal({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   return (
-    <div 
-      className={`fixed z-50 transition-all duration-300 ${
-        isMaximized 
-          ? 'inset-4' 
-          ) => setIsMaximized(!isMaximized)}
-            className="p-1 text-terminal-text-dim hover="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-          </button>
+    <div
+      className={`fixed z-[100] transition-all duration-300 flex flex-col ${isMaximized
+          ? 'inset-4 bg-terminal-bg'
+          : 'bottom-20 right-6 w-full max-w-2xl h-[400px] shadow-2xl'
+        }`}
+    >
+      <div className="terminal-window h-full flex flex-col border border-terminal-green/30">
+        <div className="terminal-header flex items-center justify-between px-4 py-2 bg-terminal-bg-light border-b border-terminal-border">
+          <div className="flex items-center gap-2">
+            <div className="terminal-dot terminal-dot-red" onClick={onClose} />
+            <div className="terminal-dot terminal-dot-yellow" />
+            <div className="terminal-dot terminal-dot-green" />
+            <span className="ml-4 text-terminal-text-dim text-xs font-mono flex items-center gap-2">
+              <Terminal className="w-4 h-4" />
+              Interactive Shell
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsMaximized(!isMaximized)}
+              className="p-1 text-terminal-text-dim hover:text-terminal-text"
+            >
+              {isMaximized ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+            </button>
+            <button onClick={onClose} className="p-1 text-terminal-text-dim hover:text-terminal-red">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
-        {/* Terminal Body */}
-        <div 
+        <div
           ref={terminalRef}
-          className="terminal-body flex-1 overflow-y-auto font-mono text-sm"
+          className="terminal-body flex-1 overflow-y-auto font-mono text-sm p-4 bg-terminal-bg/95 backdrop-blur-md"
+          onClick={() => inputRef.current?.focus()}
         >
-          {/* Welcome */}
           {history.length === 0 && (
-            <div className="text-terminal-text-dim mb-4">
-              <p>DevCLI Interactive Terminal v2.4.1</p>
-              <p>Type 'help' for available commands or explore the filesystem.</p>
-              <p className="text-terminal-text-dim/50 text-xs mt-2">Tip)}
+            <div className="text-terminal-text-dim mb-4 space-y-1">
+              <p className="text-terminal-green font-bold">DevCLI v2.4.1 (Stable)</p>
+              <p>Type 'help' for available commands.</p>
+              <p className="text-xs opacity-50">Press ESC or Close to exit.</p>
+            </div>
+          )}
 
-          {/* Command History */}
           {history.map((cmd, i) => (
             <div key={i} className="mb-3">
               <div className="flex items-center gap-2">
                 <span className="text-terminal-green">developer@devcli</span>
-                <span className="text-terminal-text">) => (
-                <div 
-                  key={j} 
-                  className={`${cmd.isError ? 'text-terminal-red' ) ? parseAnsi(line) : line}
-                </div>
-              ))}
+                <span className="text-terminal-text">:</span>
+                <span className="text-terminal-blue">{cmd.cwd}</span>
+                <span className="text-terminal-text">$</span>
+                <span className="text-terminal-text">{cmd.input}</span>
+              </div>
+              <div className="mt-1 space-y-0.5">
+                {cmd.output.map((line, j) => (
+                  <div
+                    key={j}
+                    className={`${cmd.isError ? 'text-terminal-red' : 'text-terminal-text'} whitespace-pre-wrap leading-relaxed`}
+                  >
+                    {line.includes('\x1b[') ? parseAnsi(line) : line}
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
 
-          {/* Input Line */}
           <form onSubmit={handleSubmit} className="flex items-center gap-2">
             <span className="text-terminal-green">developer@devcli</span>
             <span className="text-terminal-text">:</span>
@@ -301,11 +365,10 @@ export default function InteractiveTerminal({ isOpen, onClose }) {
               autoComplete="off"
               spellCheck={false}
             />
-            <span className="cursor-blink text-terminal-green">█</span>
+            <span className="animate-pulse text-terminal-green">█</span>
           </form>
         </div>
       </div>
     </div>
   );
 }
-

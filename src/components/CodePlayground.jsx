@@ -1,357 +1,134 @@
-import { useState, useEffect, useRef } from 'react';
-import { Play, RotateCcw, Copy, Check, Terminal, Settings } from 'lucide-react';
+import { useState } from 'react';
+import { Code2, Play, Save, ChevronRight, Sparkles } from 'lucide-react';
 
-// interface Language {
-  id= [
-  {
-    id,
-    name,
-    extension,
-    template) {
-    // DevCLI makes Go development seamless
-    project := "my-awesome-app"
-    fmt.Printf("Building %s...\\n", project)
-    
-    // One command to rule them all
-    // $ devcli run build
-    
-    fmt.Println("✓ Build successful!")
-}`
-  },
-  {
-    id,
-    name,
-    extension,
-    template):
-    # Create virtual environment
-    # $ devcli env create python 3.11
-    
-    project_name = "data-pipeline"
-    
-    # Install dependencies
-    # $ devcli run install
-    
-    # Run tests
-    # $ devcli run test
-    
-    print(f"✓ Project {project_name} ready!")
+const demoCode = {
+  go: `package main
 
-if __name__ == "__main__":
-    main()`
-  },
-  {
-    id,
-    name,
-    extension,
-    template= {
-  name,
-  framework);`
-  },
-  {
-    id,
-    name,
-    extension,
-    template) {
-    let project = "high-performance-api";
-    
-    // Build with optimizations
-    // $ devcli run build --release
-    
-    // Run tests
-    // $ devcli run test
-    
-    // Check code
-    // $ devcli run check
-    
-    println!("✓ {} compiled successfully!", project);
-}`
-  },
-  {
-    id,
-    name,
-    extension,
-    template="my-project"
+import "fmt"
 
-echo "🚀 Initializing $PROJECT_NAME..."
-
-# Create project from template
-devcli project new $PROJECT_NAME --template go
-
-# Setup environment
-devcli env create go 1.21
-
-# Install hooks
-devcli create pre-commit
-
-echo "✓ Project $PROJECT_NAME is ready!"`
-  }
-];
-
-const syntaxPatterns, { pattern= {
-  go, color,
-    { pattern, color,
-    { pattern)\b/g, color,
-    { pattern)*"/g, color,
-    { pattern)\b/g, color,
-    { pattern, color,
-    { pattern)\b/g, color,
-  ],
-  python, color,
-    { pattern, color,
-    { pattern)\b/g, color,
-    { pattern)*"|'([^'\\]|\\.)*'/g, color,
-    { pattern, color,
-    { pattern)\b/g, color,
-  ],
-  typescript, color,
-    { pattern, color,
-    { pattern)\b/g, color,
-    { pattern)*"|'([^'\\]|\\.)*'|`([^`\\]|\\.)*`/g, color,
-    { pattern)\b/g, color,
-    { pattern, color,
-    { pattern)\b/g, color,
-  ],
-  rust, color,
-    { pattern, color,
-    { pattern)\b/g, color,
-    { pattern)*"/g, color,
-    { pattern)\b/g, color,
-    { pattern, color,
-    { pattern)\b/g, color,
-  ],
-  bash, color,
-    { pattern)\b/g, color,
-    { pattern)*"|'([^'\\]|\\.)*'/g, color,
-    { pattern, color,
-    { pattern, color,
-  ]
-};
-
-function highlightCode() {
-  const patterns = syntaxPatterns[lang] || [];
-  
-  // Simple syntax highlighting - replace with spans
-  // This is a basic implementation - for production, use a proper highlighter
-  const lines = code.split('\n');
-  
-  return (
-    <>
-      {lines.map((line, lineIndex) => {
-        let highlightedLine = line;
-        
-        // Apply patterns
-        patterns.forEach(({ pattern, color }) => {
-          highlightedLine = highlightedLine.replace(pattern, (match) => {
-            return `###${color}###${match}###END###`;
-          });
-        });
-        
-        // Split by markers and create elements
-        const parts = highlightedLine.split(/(###[^#]+###|###END###)/);
-        let currentColor = 'text-terminal-text';
-        
-        return (
-          <div key={lineIndex} className="table-row">
-            <span className="table-cell text-terminal-text-dim text-right pr-4 select-none w-12">
-              {lineIndex + 1}
-            </span>
-            <span className="table-cell">
-              {parts.map((part, partIndex) => {
-                if (part.startsWith('###') && part.endsWith('###') && !part.includes('END')) {
-                  currentColor = part.slice(3, -3);
-                  return null;
-                }
-                if (part === '###END###') {
-                  currentColor = 'text-terminal-text';
-                  return null;
-                }
-                return <span key={partIndex} className={currentColor}>{part || ' '}</span>;
-              })}
-            </span>
-          </div>
-        );
-      })}
-    </>
-  );
+func main() {
+    fmt.Println("Hello, DevCLI!")
+}`,
+  typescript: `interface User {
+  id: number;
+  name: string;
 }
 
+const greet = (user: User) => {
+  console.log(\`Hello, \${user.name}!\`);
+};`,
+  python: `def greet(name):
+    print(f"Hello, {name}!")
+
+if __name__ == "__main__":
+    greet("DevCLI")`
+};
+
 export default function CodePlayground() {
-  const [selectedLang, setSelectedLang] = useState(languages[0]);
-  const [code, setCode] = useState(languages[0].template);
-  const [output, setOutput] = useState([]);
+  const [lang, setLang] = useState('go');
+  const [code, setCode] = useState(demoCode.go);
+  const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-  const textareaRef = useRef(null);
 
-  useEffect(() => {
-    setCode(selectedLang.template);
-    setOutput([]);
-  }, [selectedLang]);
+  const handleLangChange = (newLang) => {
+    setLang(newLang);
+    setCode(demoCode[newLang]);
+    setOutput('');
+  };
 
-  const handleRun = () => {
+  const runCode = () => {
     setIsRunning(true);
-    setOutput([]);
-    
-    // Simulate running the code
-    const lines = [
-      `$ ${selectedLang.id === 'bash' ? '' : selectedLang.id} ${selectedLang.id === 'bash' ? './script.sh' : 'run'}`,
-      'Compiling...',
-      '...',
-      '✓ Compilation successful',
-      '',
-      '--- Output ---',
-    ];
+    setOutput('> Compiling...\\n> Running execution environment...\\n');
 
-    if (selectedLang.id === 'go') {
-      lines.push('Building my-awesome-app...', '✓ Build successful!');
-    } else if (selectedLang.id === 'python') {
-      lines.push('✓ Project data-pipeline ready!');
-    } else if (selectedLang.id === 'typescript') {
-      lines.push('✓ awesome-dashboard is running!');
-    } else if (selectedLang.id === 'rust') {
-      lines.push('✓ high-performance-api compiled successfully!');
-    } else if (selectedLang.id === 'bash') {
-      lines.push('🚀 Initializing my-project...', '✓ Project my-project is ready!');
-    }
+    setTimeout(() => {
+      let result = '';
+      if (lang === 'go') result = 'Hello, DevCLI!\\n\\nProgram exited with code 0';
+      if (lang === 'typescript') result = 'Hello, Developer!\\n\\nProgram exited with code 0';
+      if (lang === 'python') result = 'Hello, DevCLI!\\n\\nProgram exited with code 0';
 
-    lines.forEach((line, i) => {
-      setTimeout(() => {
-        setOutput(prev => [...prev, line]);
-        if (i === lines.length - 1) {
-          setIsRunning(false);
-        }
-      }, i * 200);
-    });
-  };
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const handleReset = () => {
-    setCode(selectedLang.template);
-    setOutput([]);
+      setOutput(prev => prev + result);
+      setIsRunning(false);
+    }, 1500);
   };
 
   return (
-    <div className="terminal-window">
-      <div className="terminal-header">
-        <div className="flex items-center gap-2">
+    <div className="terminal-window h-[600px] flex flex-col shadow-glow-blue border-terminal-blue/30">
+      <div className="terminal-header flex justify-between">
+        <div className="flex gap-2">
           <div className="terminal-dot terminal-dot-red" />
           <div className="terminal-dot terminal-dot-yellow" />
           <div className="terminal-dot terminal-dot-green" />
         </div>
-        
-        {/* Language Tabs */}
-        <div className="flex items-center gap-1 ml-4">
-          {languages.map((lang) => (
+        <div className="flex gap-4">
+          {Object.keys(demoCode).map(l => (
             <button
-              key={lang.id}
-              onClick={() => setSelectedLang(lang)}
-              className={`px-3 py-1 text-xs rounded transition-all ${
-                selectedLang.id === lang.id
-                  ? 'bg-terminal-green/20 text-terminal-green'
-                  : 'text-terminal-text-dim hover))}
-        </div>
-
-        {/* Actions */}
-        <div className="flex items-center gap-2 ml-auto">
-          <button
-            onClick={handleCopy}
-            className="p-1.5 text-terminal-text-dim hover="Copy code"
-          >
-            {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-          </button>
-          <button
-            onClick={handleReset}
-            className="p-1.5 text-terminal-text-dim hover="Reset code"
-          >
-            <RotateCcw className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => setShowSettings(!showSettings)}
-            className="p-1.5 text-terminal-text-dim hover="Settings"
-          >
-            <Settings className="w-4 h-4" />
-          </button>
+              key={l}
+              onClick={() => handleLangChange(l)}
+              className={`text-[10px] uppercase font-bold tracking-widest transition-colors ${lang === l ? 'text-terminal-blue' : 'text-terminal-text-dim hover:text-terminal-text'
+                }`}
+            >
+              {l}
+            </button>
+          ))}
         </div>
       </div>
 
-      <div className="terminal-body p-0">
-        {/* Editor */}
-        <div className="relative">
-          <div className="flex">
-            {/* Line Numbers */}
-            <div className="bg-terminal-bg-light border-r border-terminal-border py-4 px-3 text-right text-terminal-text-dim text-sm select-none">
-              {code.split('\n').map((_, i) => (
-                <div key={i}>{i + 1}</div>
-              ))}
+      <div className="flex-1 grid md:grid-cols-2 overflow-hidden">
+        {/* Editor Area */}
+        <div className="border-r border-terminal-border flex flex-col bg-terminal-bg/50">
+          <div className="p-2 border-b border-terminal-border flex justify-between items-center bg-terminal-bg">
+            <span className="text-[10px] text-terminal-text-dim font-mono flex items-center gap-1">
+              <Code2 className="w-3 h-3" /> editor.{lang === 'typescript' ? 'ts' : lang}
+            </span>
+            <div className="flex gap-2">
+              <button className="text-terminal-text-dim hover:text-terminal-text"><Save className="w-3.5 h-3.5" /></button>
+              <button
+                onClick={runCode}
+                disabled={isRunning}
+                className={`flex items-center gap-1 px-3 py-1 rounded bg-terminal-blue/20 text-terminal-blue text-[10px] font-bold hover:bg-terminal-blue transition-all disabled:opacity-50`}
+              >
+                <Play className="w-3 h-3 fill-current" /> RUN
+              </button>
             </div>
-            
-            {/* Code Area */}
-            <div className="flex-1 relative">
-              <textarea
-                ref={textareaRef}
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                className="w-full h-64 bg-transparent text-transparent caret-terminal-green p-4 font-mono text-sm resize-none outline-none absolute inset-0 z-10"
-                spellCheck={false}
-              />
-              <pre className="w-full h-64 bg-terminal-bg p-4 font-mono text-sm overflow-auto pointer-events-none">
-                <code className="table">
-                  {highlightCode(code, selectedLang.id)}
-                </code>
-              </pre>
-            </div>
+          </div>
+          <div className="flex-1 p-4 font-mono text-sm overflow-auto text-terminal-text selection:bg-terminal-blue/30 whitespace-pre">
+            {code}
+            <span className="animate-pulse">|</span>
           </div>
         </div>
 
-        {/* Toolbar */}
-        <div className="border-t border-terminal-border px-4 py-2 flex items-center justify-between bg-terminal-bg-light">
-          <div className="flex items-center gap-4 text-xs text-terminal-text-dim">
-            <span>{selectedLang.extension}</span>
-            <span>{code.split('\n').length} lines</span>
-            <span>{code.length} chars</span>
+        {/* Output Area */}
+        <div className="flex flex-col bg-terminal-bg">
+          <div className="p-2 border-b border-terminal-border bg-terminal-bg">
+            <span className="text-[10px] text-terminal-text-dim font-mono">Console Output</span>
           </div>
-          <button
-            onClick={handleRun}
-            disabled={isRunning}
-            className="flex items-center gap-2 px-4 py-1.5 bg-terminal-green/20 text-terminal-green rounded text-sm hover="w-4 h-4" />
-            {isRunning ? 'Running...' : 'Run Code'}
-          </button>
-        </div>
+          <div className="flex-1 p-4 font-mono text-xs overflow-auto text-terminal-text-dim space-y-2">
+            {output.split('\\n').map((line, i) => (
+              <div key={i} className={line.startsWith('>') ? 'text-terminal-blue/70' : 'text-terminal-text'}>
+                {line}
+              </div>
+            ))}
+            {!output && !isRunning && (
+              <div className="text-terminal-text-dim opacity-30 italic">Click "RUN" to execute code...</div>
+            )}
+            {isRunning && (
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 bg-terminal-blue rounded-full animate-ping" />
+                <span>Executing...</span>
+              </div>
+            )}
+          </div>
 
-        {/* Output */}
-        {output.length > 0 && (
-          <div className="border-t border-terminal-border">
-            <div className="flex items-center gap-2 px-4 py-2 bg-terminal-bg-light border-b border-terminal-border">
-              <Terminal className="w-4 h-4 text-terminal-text-dim" />
-              <span className="text-xs text-terminal-text-dim">Output</span>
+          {/* AI Helper Bar */}
+          <div className="p-3 border-t border-terminal-border bg-terminal-blue/5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-terminal-purple" />
+              <span className="text-[10px] text-terminal-text-dim">AI: No issues detected in current snippet.</span>
             </div>
-            <div className="p-4 font-mono text-sm max-h-40 overflow-y-auto">
-              {output.map((line, i) => (
-                <div 
-                  key={i} 
-                  className={`${
-                    line.startsWith('✓') ? 'text-terminal-green' :
-                    line.startsWith('$') ? 'text-terminal-text-dim' :
-                    line.startsWith('🚀') ? 'text-terminal-yellow' :
-                    line.startsWith('---') ? 'text-terminal-text-dim' :
-                    'text-terminal-text'
-                  }`}
-                >
-                  {line}
-                </div>
-              ))}
-              {isRunning && <span className="cursor-blink text-terminal-green">█</span>}
-            </div>
+            <ChevronRight className="w-4 h-4 text-terminal-text-dim" />
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
 }
-

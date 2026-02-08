@@ -1,31 +1,34 @@
 import { useState, useEffect, useCallback } from 'react';
 
-// interface GlitchTextProps {
-  text= '!@#$%^&*()_+-=[]{}|;:,.<>?/~`';
+const glitchChars = '!@#$%^&*()_+-=[]{}|;:,.<>?/~`';
 
-export default function GlitchText({ 
-  text, 
-  className = '', 
+const intensityMap = {
+  low: { duration: 200, iterations: 5, probability: 0.05 },
+  medium: { duration: 400, iterations: 10, probability: 0.1 },
+  high: { duration: 600, iterations: 15, probability: 0.2 },
+};
+
+export default function GlitchText({
+  text,
+  className = '',
   glitchIntensity = 'medium',
-  as) {
+  as: Component = 'span'
+}) {
   const [displayText, setDisplayText] = useState(text);
   const [isGlitching, setIsGlitching] = useState(false);
 
-  const intensityMap = {
-    low, duration, iterations,
-    medium, duration, iterations,
-    high, duration, iterations= useCallback(() => {
+  const triggerGlitch = useCallback(() => {
     if (isGlitching) return;
-    
-    const { duration, iterations } = intensityMap[glitchIntensity];
+
+    const { duration, iterations } = intensityMap[glitchIntensity] || intensityMap.medium;
     setIsGlitching(true);
-    
+
     let iteration = 0;
-    const interval = setInterval(() => {
+    const intervalId = setInterval(() => {
       if (iteration >= iterations) {
         setDisplayText(text);
         setIsGlitching(false);
-        clearInterval(interval);
+        clearInterval(intervalId);
         return;
       }
 
@@ -46,36 +49,38 @@ export default function GlitchText({
   }, [text, glitchIntensity, isGlitching]);
 
   useEffect(() => {
-    const { probability } = intensityMap[glitchIntensity];
-    
-    const interval = setInterval(() => {
+    const { probability } = intensityMap[glitchIntensity] || intensityMap.medium;
+
+    const intervalId = setInterval(() => {
       if (Math.random() < probability) {
         triggerGlitch();
       }
-    }, 2000);
+    }, 3000);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(intervalId);
   }, [triggerGlitch, glitchIntensity]);
 
+  useEffect(() => {
+    setDisplayText(text);
+  }, [text]);
+
   return (
-    <Component 
+    <Component
       className={`relative inline-block ${className}`}
       onMouseEnter={triggerGlitch}
     >
-      {/* Main text */}
       <span className="relative z-10">{displayText}</span>
-      
-      {/* Glitch layers */}
+
       {isGlitching && (
         <>
-          <span 
-            className="absolute top-0 left-0 text-terminal-red opacity-50 -translate-x-[2px]"
+          <span
+            className="absolute top-0 left-0 text-terminal-red opacity-50 -translate-x-[2px] z-0"
             aria-hidden="true"
           >
             {displayText}
           </span>
-          <span 
-            className="absolute top-0 left-0 text-terminal-cyan opacity-50 translate-x-[2px]"
+          <span
+            className="absolute top-0 left-0 text-terminal-cyan opacity-50 translate-x-[2px] z-0"
             aria-hidden="true"
           >
             {displayText}
@@ -85,4 +90,3 @@ export default function GlitchText({
     </Component>
   );
 }
-
