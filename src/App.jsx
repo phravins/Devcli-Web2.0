@@ -85,7 +85,7 @@ function App() {
         case '2':
         case '3':
         case '4':
-        case '5':
+        case '5': {
           const sectionIndex = parseInt(e.key) - 1;
           const sections = ['home', 'features', 'demo', 'install', 'commands'];
           const section = sections[sectionIndex];
@@ -93,6 +93,7 @@ function App() {
             document.getElementById(section)?.scrollIntoView({ behavior: 'smooth' });
           }
           break;
+        }
         case 'escape':
           setIsTerminalOpen(false);
           setShowShortcuts(false);
