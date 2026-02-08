@@ -1,49 +1,49 @@
 import { useState } from 'react';
-import { 
-  FolderGit2, 
-  Play, 
-  Container, 
-  Server, 
-  FileCode, 
-  Layers, 
-  Library, 
-  Bot, 
-  FolderOpen, 
+import {
+  FolderGit2,
+  Play,
+  Container,
+  Server,
+  FileCode,
+  Layers,
+  Library,
+  Bot,
+  FolderOpen,
   RefreshCw,
   ChevronRight,
   Check
 } from 'lucide-react';
 
-// interface Feature {
-  id= [
+const features = [
   {
-    id,
-    icon,
-    name,
-    command,
-    description, templates, and history tracking',
-    details,
+    id: 'projects',
+    icon: FolderGit2,
+    name: 'Project Manager',
+    command: 'devcli project',
+    description: 'Track recent projects with metadata, templates, and history tracking',
+    details: [
       'Track recent projects with metadata',
       'One-command project switching',
       'Custom template repository support',
     ],
-    example) - 2 days ago
-  2. api-server (go) - 1 week ago
-  3. ml-pipeline (python) - 2 weeks ago`,
-    color,
+    example: `$ devcli project list
+1. devcli-web (react) - 2 days ago
+2. api-server (go) - 1 week ago
+3. ml-pipeline (python) - 2 weeks ago`,
+    color: 'text-blue-500',
   },
   {
-    id,
-    icon,
-    name,
-    command,
-    description, test, and lint commands',
-    details,
+    id: 'runner',
+    icon: Play,
+    name: 'Task Runner',
+    command: 'devcli run',
+    description: 'Run build, test, and lint commands',
+    details: [
       'Supports Go, Python, Node, Rust, C++',
       'Parallel task execution',
       'Custom task definitions in devcli.yaml',
     ],
-    example)
+    example: `$ devcli run --help
 ❯ build    - Build the project
   test     - Run test suite
   lint     - Run linter
@@ -51,138 +51,154 @@ import {
 
 $ devcli run build
 ✓ Building... (3.2s)
-✓ Build complete,
-    color,
+✓ Build complete`,
+    color: 'text-green-500',
   },
   {
-    id,
-    icon,
-    name,
-    command,
-    description,
-    details,
+    id: 'env',
+    icon: Container,
+    name: 'Environment',
+    command: 'devcli env',
+    description: 'Manage Docker and Node.js environments',
+    details: [
       'Node.js version management with nvm',
       'Docker container orchestration',
       'Environment variable management',
     ],
-    example,
-    color,
+    example: `$ devcli env status
+Node: v20.11.0 (LTS)
+Docker: Running (3 containers)
+System: Healthy`,
+    color: 'text-cyan-500',
   },
   {
-    id,
-    icon,
-    name,
-    command,
-    description,
-    details,
+    id: 'server',
+    icon: Server,
+    name: 'Dev Server',
+    command: 'devcli dev',
+    description: 'Live reload on file changes',
+    details: [
       'Live reload on file changes',
       'HTTPS support with local certs',
       'Proxy configuration for APIs',
     ],
-    example,
-    color,
+    example: `$ devcli dev
+Scanning for entry points...
+🚀 Dev server running at http://localhost:3000
+Watching for changes...`,
+    color: 'text-orange-500',
   },
   {
-    id,
-    icon,
-    name,
-    command,
-    description, .env, Makefiles, and CI/CD configs',
-    details,
+    id: 'scaffold',
+    icon: FileCode,
+    name: 'Scaffolding',
+    command: 'devcli init',
+    description: 'Initialize .env, Makefiles, and CI/CD configs',
+    details: [
       'Context-aware generation',
       'Interactive configuration wizard',
       'Custom template support',
     ],
-    example)
-✓ Size optimized,
-    color,
+    example: `$ devcli init
+? Project name: my-app
+? Select template: React + Tailwind
+? Enable CI/CD: Yes (GitHub Actions)
+
+✓ Created .env
+✓ Created Makefile
+✓ Created .github/workflows`,
+    color: 'text-purple-500',
   },
   {
-    id,
-    icon,
-    name,
-    command,
-    description,
-    details,
+    id: 'api',
+    icon: Layers,
+    name: 'API Generator',
+    command: 'devcli api',
+    description: 'Generate API endpoints and models',
+    details: [
       'API endpoint scaffolding',
       'Database models and migrations',
       'Test file generation',
     ],
-    example, price, stock,
-    color,
+    example: `$ devcli api model User id:int name:string
+✓ Created internal/models/user.go
+✓ Created internal/db/migrations/001_create_users.sql`,
+    color: 'text-yellow-500',
   },
   {
-    id,
-    icon,
-    name,
-    command,
-    description,
-    details,
+    id: 'snippet',
+    icon: Library,
+    name: 'Snippet Manager',
+    command: 'devcli snippet',
+    description: 'Full-text search across snippets',
+    details: [
       'Full-text search across snippets',
       'Syntax highlighting for 50+ languages',
       'Sync across devices',
     ],
-    example, middleware, jwt
+    example: `$ devcli snippet save auth.go --name "JWT Middleware"
 ✓ Snippet saved
 
 $ devcli snippet search "jwt"
-  1. JWT Auth Middleware (go)
-  2. JWT Refresh Token (typescript)
-  3. JWT Claims Parser (python)`,
-    color,
+1. JWT Auth Middleware (go)
+2. JWT Refresh Token (typescript)
+3. JWT Claims Parser (python)`,
+    color: 'text-pink-500',
   },
   {
-    id,
-    icon,
-    name,
-    command,
-    description, debugging, and explanations',
-    details,
+    id: 'ai',
+    icon: Bot,
+    name: 'AI Assistant',
+    command: 'devcli ai',
+    description: 'AI-powered debugging and explanations',
+    details: [
       'Debug error messages',
       'Explain complex code',
       'Generate documentation',
     ],
-    example) Database"
+    example: `$ devcli ai explain "func(db *sql.DB) Database"
 
 The issue is that your function expects an interface type 
 'Database', but you're passing a concrete type '*sql.DB'.
 
-Fix= (*sql.DB)(nil) // compile-time check`,
-    color,
+Fix: var _ Database = (*sql.DB)(nil) // compile-time check`,
+    color: 'text-indigo-500',
   },
   {
-    id,
-    icon,
-    name,
-    command,
-    description,
-    details,
+    id: 'files',
+    icon: FolderOpen,
+    name: 'File Explorer',
+    command: 'devcli file',
+    description: 'Browse and preview files',
+    details: [
       'Fuzzy file finder',
       'Inline file preview',
       'Batch operations support',
     ],
-    example,
-    color,
+    example: `$ devcli file find "user_controller"
+1. app/controllers/user_controller.rb
+2. app/controllers/api/v1/user_controller.rb`,
+    color: 'text-amber-500',
   },
   {
-    id,
-    icon,
-    name,
-    command,
-    description,
-    details,
+    id: 'update',
+    icon: RefreshCw,
+    name: 'Updater',
+    command: 'devcli update',
+    description: 'Keep your tools up to date',
+    details: [
       'One-command updates',
       'Rollback to previous versions',
       'Update notifications',
     ],
-    example)
-⚠ go)
+    example: `$ devcli update status
+⚠ 3 tools have newer versions available
 
 $ devcli update all
 ✓ Updated go to v1.21.5
 ✓ Updated node to v20.5.0
 ✓ All tools are up to date`,
-    color,
+    color: 'text-emerald-500',
   },
 ];
 
@@ -200,22 +216,42 @@ export default function Features() {
   };
 
   return (
-    <div className="min-h-screen py-20 px-4 sm) => {
+    <div id="features" className="min-h-screen py-20 px-4 sm:px-6 lg:px-8 bg-terminal-bg">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold text-terminal-text mb-4">
+            Powerful Features for Modern Devs
+          </h2>
+          <p className="text-terminal-text-dim max-w-2xl mx-auto">
+            Everything you need to build, manage, and scale your applications from the terminal.
+          </p>
+        </div>
+
+        <div className="grid lg:grid-cols-12 gap-8">
+          {/* Feature List */}
+          <div className="lg:col-span-4 space-y-2">
+            {features.map((feature) => {
               const Icon = feature.icon;
               const isActive = feature.id === activeFeature.id;
-              
+
               return (
                 <button
                   key={feature.id}
                   onClick={() => handleFeatureClick(feature)}
-                  className={`w-full text-left p-4 rounded-lg border transition-all duration-200 group ${
-                    isActive
+                  className={`w-full text-left p-4 rounded-lg border transition-all duration-200 group ${isActive
                       ? 'bg-terminal-bg-light border-terminal-green shadow-terminal'
-                      : 'bg-terminal-bg border-terminal-border hover="flex items-start gap-3">
+                      : 'bg-terminal-bg border-terminal-border hover:border-terminal-blue'
+                    }`}
+                >
+                  <div className="flex items-start gap-3">
                     <Icon className={`w-5 h-5 mt-0.5 ${feature.color}`} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className={`font-medium ${isActive ? 'text-terminal-text' : 'text-terminal-text-dim group-hover="w-4 h-4 text-terminal-green" />
+                        <span className={`font-medium ${isActive ? 'text-terminal-text' : 'text-terminal-text-dim group-hover:text-terminal-text'}`}>
+                          {feature.name}
+                        </span>
+                        {isActive && (
+                          <ChevronRight className="w-4 h-4 text-terminal-green" />
                         )}
                       </div>
                       <p className="text-xs text-terminal-text-dim mt-1 truncate">
@@ -229,7 +265,8 @@ export default function Features() {
           </div>
 
           {/* Feature Detail Terminal */}
-          <div className="lg="terminal-window h-full terminal-glow-blue">
+          <div className="lg:col-span-8">
+            <div className="terminal-window h-full terminal-glow-blue">
               {/* Terminal Header */}
               <div className="terminal-header">
                 <div className="terminal-dot terminal-dot-red" />
@@ -280,7 +317,8 @@ export default function Features() {
 
                 {/* Quick Action */}
                 <div className="flex items-center gap-4 pt-4 border-t border-terminal-border">
-                  <span className="text-terminal-text-dim text-sm">Try it="bg-terminal-bg-light px-3 py-1.5 rounded text-terminal-green text-sm">
+                  <span className="text-terminal-text-dim text-sm">Try it now:</span>
+                  <code className="bg-terminal-bg-light px-3 py-1.5 rounded text-terminal-green text-sm">
                     {activeFeature.command} --help
                   </code>
                 </div>
@@ -292,4 +330,3 @@ export default function Features() {
     </div>
   );
 }
-

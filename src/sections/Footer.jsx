@@ -1,49 +1,60 @@
 import { Github, Twitter, MessageCircle, Mail, Heart, Terminal, ExternalLink } from 'lucide-react';
 
 const footerLinks = {
-  product, href,
-    { label, href,
-    { label, href,
-    { label, href,
+  product: [
+    { label: 'Features', href: '#features' },
+    { label: 'Demo', href: '#demo' },
+    { label: 'Installation', href: '#install' },
+    { label: 'Commands', href: '#commands' },
   ],
-  resources, href, external,
-    { label, href, external,
-    { label, href, external,
-    { label, href, external,
+  resources: [
+    { label: 'Documentation', href: 'https://docs.devcli.sh', external: true },
+    { label: 'API Reference', href: 'https://api.devcli.sh', external: true },
+    { label: 'Examples', href: 'https://github.com/phravins/devcli-examples', external: true },
+    { label: 'Blog', href: 'https://devcli.sh/blog', external: true },
   ],
-  community, href, external,
-    { label, href, external,
-    { label, href, external,
-    { label, href, external,
+  community: [
+    { label: 'GitHub', href: 'https://github.com/phravins', external: true },
+    { label: 'Discord', href: 'https://discord.gg/devcli', external: true },
+    { label: 'Twitter', href: 'https://twitter.com/devcli', external: true },
   ],
-  legal, href, external,
-    { label, href, external,
-    { label, href, external,
-    { label, href, external,
+  legal: [
+    { label: 'Privacy Policy', href: '/privacy' },
+    { label: 'Terms of Service', href: '/terms' },
+    { label: 'Cookie Policy', href: '/cookies' },
   ],
 };
 
 const socialLinks = [
-  { icon, href, label,
-  { icon, href, label,
-  { icon, href, label,
-  { icon, href, label,
+  { icon: Github, href: 'https://github.com/phravins', label: 'GitHub' },
+  { icon: Twitter, href: 'https://twitter.com/devcli', label: 'Twitter' },
+  { icon: MessageCircle, href: 'https://discord.gg/devcli', label: 'Discord' },
+  { icon: Mail, href: 'mailto:hello@devcli.sh', label: 'Email' },
 ];
 
 export default function Footer() {
-  const scrollToSection = (href) => {
-    if (href.startsWith('#')) {
-      const element = document.getElementById(href.slice(1));
-      if (element) {
-        element.scrollIntoView({ behavior);
-      }
+  const scrollToSection = (id) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
   return (
-    <footer className="border-t border-terminal-border bg-terminal-bg">
-      {/* Main Footer */}
-      <div className="max-w-7xl mx-auto px-4 sm) => {
+    <footer className="bg-terminal-bg border-t border-terminal-border pt-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-12 lg:gap-8">
+          {/* Brand Column */}
+          <div className="col-span-2 space-y-6">
+            <div className="flex items-center gap-2 group cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+              <Terminal className="w-8 h-8 text-terminal-green group-hover:scale-110 transition-transform" />
+              <span className="text-xl font-bold text-terminal-text tracking-tighter">DEVCLI</span>
+            </div>
+            <p className="text-terminal-text-dim text-sm max-w-xs leading-relaxed">
+              The ultimate terminal-based development workspace. Build faster, stay focused, and own your environment.
+            </p>
+            <div className="flex items-center gap-4">
+              {socialLinks.map((social) => {
                 const Icon = social.icon;
                 return (
                   <a
@@ -51,94 +62,107 @@ export default function Footer() {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2 text-terminal-text-dim hover);
+                    className="text-terminal-text-dim hover:text-terminal-text transition-colors"
+                  >
+                    <Icon className="w-5 h-5" />
+                  </a>
+                );
               })}
             </div>
           </div>
 
-          {/* Product Links */}
-          <div>
-            <h4 className="text-terminal-text font-semibold mb-4">Product</h4>
-            <ul className="space-y-2">
+          {/* Links Columns */}
+          <div className="space-y-6">
+            <h4 className="text-terminal-text font-bold text-sm uppercase tracking-widest">Product</h4>
+            <ul className="space-y-3">
               {footerLinks.product.map((link) => (
                 <li key={link.label}>
                   <button
-                    onClick={() => scrollToSection(link.href)}
-                    className="text-terminal-text-dim hover))}
+                    onClick={() => scrollToSection(link.href.slice(1))}
+                    className="text-terminal-text-dim hover:text-terminal-green text-sm transition-colors"
+                  >
+                    {link.label}
+                  </button>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Resources Links */}
-          <div>
-            <h4 className="text-terminal-text font-semibold mb-4">Resources</h4>
-            <ul className="space-y-2">
+          <div className="space-y-6">
+            <h4 className="text-terminal-text font-bold text-sm uppercase tracking-widest">Resources</h4>
+            <ul className="space-y-3">
               {footerLinks.resources.map((link) => (
                 <li key={link.label}>
                   <a
                     href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-terminal-text-dim hover))}
+                    className="text-terminal-text-dim hover:text-terminal-blue text-sm transition-colors flex items-center gap-1"
+                  >
+                    {link.label} <ExternalLink className="w-3 h-3 opacity-50" />
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Community Links */}
-          <div>
-            <h4 className="text-terminal-text font-semibold mb-4">Community</h4>
-            <ul className="space-y-2">
+          <div className="space-y-6">
+            <h4 className="text-terminal-text font-bold text-sm uppercase tracking-widest">Community</h4>
+            <ul className="space-y-3">
               {footerLinks.community.map((link) => (
                 <li key={link.label}>
                   <a
                     href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-terminal-text-dim hover))}
+                    className="text-terminal-text-dim hover:text-terminal-purple text-sm transition-colors flex items-center gap-1"
+                  >
+                    {link.label} <ExternalLink className="w-3 h-3 opacity-50" />
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Legal Links */}
-          <div>
-            <h4 className="text-terminal-text font-semibold mb-4">Legal</h4>
-            <ul className="space-y-2">
+          <div className="space-y-6">
+            <h4 className="text-terminal-text font-bold text-sm uppercase tracking-widest">Legal</h4>
+            <ul className="space-y-3">
               {footerLinks.legal.map((link) => (
                 <li key={link.label}>
                   <a
                     href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-terminal-text-dim hover))}
+                    className="text-terminal-text-dim hover:text-terminal-text text-sm transition-colors"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
       </div>
 
-      {/* Bottom Bar */}
-      <div className="border-t border-terminal-border">
-        <div className="max-w-7xl mx-auto px-4 sm="flex flex-col sm="flex items-center gap-2 text-sm text-terminal-text-dim">
-              <span>© {new Date().getFullYear()} DevCLI.</span>
-              <span>Made with</span>
-              <Heart className="w-4 h-4 text-terminal-red inline" />
-              <span>by developers, for developers.</span>
-            </div>
-
-            {/* Stats */}
-            <div className="flex items-center gap-6 text-sm">
-              <div className="flex items-center gap-2">
-                <span className="text-terminal-text-dim">Latest="text-terminal-green">v2.4.1</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-terminal-text-dim">License="https="_blank"
-                  rel="noopener noreferrer"
-                  className="text-terminal-yellow hover="border-t border-terminal-border bg-terminal-bg-light">
-        <div className="max-w-7xl mx-auto px-4 sm="flex items-center gap-3 text-sm">
-            <span className="text-terminal-green">visitor@devcli.sh</span>
-            <span className="text-terminal-text">:~$</span>
-            <span className="text-terminal-text-dim"># Thanks for visiting! Star us on GitHub ⭐</span>
-            <span className="cursor-blink text-terminal-green">█</span>
+      {/* Credits Bar */}
+      <div className="border-t border-terminal-border bg-terminal-bg-light/50 py-8 text-center text-sm text-terminal-text-dim">
+        <div className="flex flex-col items-center gap-2">
+          <div className="flex items-center gap-2">
+            <span>© {new Date().getFullYear()} DevCLI Tools Inc.</span>
+            <span className="opacity-30">|</span>
+            <span className="flex items-center gap-1">
+              Made with <Heart className="w-3 h-3 text-terminal-red fill-current" /> by developers
+            </span>
           </div>
+          <div className="font-mono text-[10px] opacity-50 mt-2">
+            DEVCLI_STATUS: STABLE // RELEASE_CHANNEL: MAIN // VERSION: 2.4.1
+          </div>
+        </div>
+      </div>
+
+      {/* Terminal Footer Strip */}
+      <div className="bg-terminal-bg border-t border-terminal-border py-2 px-4">
+        <div className="max-w-7xl mx-auto flex items-center gap-2 font-mono text-xs">
+          <span className="text-terminal-green">developer@devcli</span>
+          <span className="text-terminal-text">:~$</span>
+          <span className="text-terminal-text-dim"># Thanks for watching. Happy coding!</span>
+          <span className="w-2 h-4 bg-terminal-green animate-pulse ml-1" />
         </div>
       </div>
     </footer>
   );
 }
-
