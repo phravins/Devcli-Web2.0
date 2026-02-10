@@ -2,6 +2,7 @@ import { useState } from 'react';
 import SystemMonitor from '../components/SystemMonitor';
 import FileTree from '../components/FileTree';
 import GlitchText from '../components/GlitchText';
+import CodePlayground from '../components/CodePlayground';
 import { Activity, Code2, FolderTree, Sparkles, Cpu, Zap } from 'lucide-react';
 
 const CodePlaygroundPlaceholder = () => (
