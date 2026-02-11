@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Github, Twitter, MessageCircle, Mail, Heart, Terminal, ExternalLink } from 'lucide-react';
 
 const footerLinks = {
@@ -8,10 +9,10 @@ const footerLinks = {
     { label: 'Commands', href: '#commands' },
   ],
   resources: [
-    { label: 'Documentation', href: 'https://docs.devcli.sh', external: true },
-    { label: 'API Reference', href: 'https://api.devcli.sh', external: true },
-    { label: 'Examples', href: 'https://github.com/phravins/devcli-examples', external: true },
-    { label: 'Blog', href: 'https://devcli.sh/blog', external: true },
+    { label: 'Documentation', href: '/docs', internal: true },
+    { label: 'API Reference', href: '/api', internal: true },
+    { label: 'Features', href: '/features', internal: true },
+    { label: 'GitHub', href: 'https://github.com/phravins', external: true },
   ],
   community: [
     { label: 'GitHub', href: 'https://github.com/phravins', external: true },
@@ -19,9 +20,9 @@ const footerLinks = {
     { label: 'Twitter', href: 'https://twitter.com/devcli', external: true },
   ],
   legal: [
-    { label: 'Privacy Policy', href: '/privacy' },
-    { label: 'Terms of Service', href: '/terms' },
-    { label: 'Cookie Policy', href: '/cookies' },
+    { label: 'Privacy Policy', href: '/privacy', internal: true },
+    { label: 'Cookie Policy', href: '/cookies', internal: true },
+    { label: 'Terms of Service', href: '/privacy', internal: true },
   ],
 };
 
@@ -93,12 +94,23 @@ export default function Footer() {
             <ul className="space-y-3">
               {footerLinks.resources.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-terminal-text-dim hover:text-terminal-blue text-sm transition-colors flex items-center gap-1"
-                  >
-                    {link.label} <ExternalLink className="w-3 h-3 opacity-50" />
-                  </a>
+                  {link.internal ? (
+                    <Link
+                      to={link.href}
+                      className="text-terminal-text-dim hover:text-terminal-blue text-sm transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-terminal-text-dim hover:text-terminal-blue text-sm transition-colors flex items-center gap-1"
+                    >
+                      {link.label} <ExternalLink className="w-3 h-3 opacity-50" />
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
@@ -125,12 +137,12 @@ export default function Footer() {
             <ul className="space-y-3">
               {footerLinks.legal.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={link.href}
+                  <Link
+                    to={link.href}
                     className="text-terminal-text-dim hover:text-terminal-text text-sm transition-colors"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
