@@ -1,5 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { ArrowDown, Copy, Check, Terminal, Cpu, Zap, Sparkles } from 'lucide-react';
+import Scene3D from '../components/Scene3D';
+
 
 const asciiLogo = `
 ██████╗ ███████╗██╗   ██╗ ██████╗██╗     ██╗
@@ -92,6 +94,9 @@ export default function Hero() {
       ref={containerRef}
       className="min-h-screen flex flex-col justify-center items-center px-4 sm:px-6 relative overflow-hidden bg-terminal-bg"
     >
+      {/* 3D Background Scene */}
+      <Scene3D mousePosition={mousePos} />
+
       {/* Background Glow */}
       <div
         className="pointer-events-none absolute inset-0 z-0 transition-opacity duration-300"
@@ -99,6 +104,7 @@ export default function Hero() {
           background: `radial-gradient(circle 600px at ${mousePos.x}px ${mousePos.y}px, rgba(63, 185, 80, 0.05) 0%, transparent 70%)`
         }}
       />
+
 
       {/* Main Content Container */}
       <div className="w-full max-w-4xl relative z-10">

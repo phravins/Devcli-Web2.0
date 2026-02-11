@@ -5,6 +5,7 @@ import Demo from './sections/Demo';
 import Installation from './sections/Installation';
 import Commands from './sections/Commands';
 import AdvancedFeatures from './sections/AdvancedFeatures';
+import ThreeDShowcase from './sections/ThreeDShowcase';
 import Footer from './sections/Footer';
 import Navigation from './sections/Navigation';
 import MatrixRain from './components/MatrixRain';
@@ -218,6 +219,7 @@ function App() {
         <section id="demo">
           <Demo />
         </section>
+        <ThreeDShowcase />
         <section id="install">
           <Installation />
         </section>
