@@ -87,7 +87,11 @@ const demoCommands = [
 
 export default function Demo() {
   const [currentCommandIndex, setCurrentCommandIndex] = useState(0);
-  const [currentOutput, setCurrentOutput] = useState([]);
+  const [currentOutput, setCurrentOutput] = useState([
+    '# DevCLI Interactive Demo',
+    '# Watch automated command playback below',
+    '',
+  ]);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
   const [typedCommand, setTypedCommand] = useState('');
@@ -141,7 +145,11 @@ export default function Demo() {
       if (currentCommandIndex === demoCommands.length - 1) {
         await new Promise(r => setTimeout(r, 2000));
         if (isMounted) {
-          setCurrentOutput([]);
+          setCurrentOutput([
+            '# DevCLI Interactive Demo',
+            '# Watch automated command playback below',
+            '',
+          ]);
           setCurrentCommandIndex(0);
         }
       } else {
@@ -158,7 +166,11 @@ export default function Demo() {
 
   const handleReset = () => {
     setCurrentCommandIndex(0);
-    setCurrentOutput([]);
+    setCurrentOutput([
+      '# DevCLI Interactive Demo',
+      '# Watch automated command playback below',
+      '',
+    ]);
     setTypedCommand('');
     setIsPlaying(true);
   };
@@ -207,11 +219,11 @@ export default function Demo() {
               <div
                 key={index}
                 className={`${line.startsWith('$') ? 'text-terminal-green font-bold mt-4 first:mt-0' :
-                    line.startsWith('✓') ? 'text-terminal-green-bright' :
-                      line.startsWith('🤖') ? 'text-terminal-purple font-bold' :
-                        line.startsWith('  📁') ? 'text-terminal-blue' :
-                          line.startsWith('  🐍') || line.startsWith('  ⬢') ? 'text-terminal-cyan' :
-                            'text-terminal-text'
+                  line.startsWith('✓') ? 'text-terminal-green-bright' :
+                    line.startsWith('🤖') ? 'text-terminal-purple font-bold' :
+                      line.startsWith('  📁') ? 'text-terminal-blue' :
+                        line.startsWith('  🐍') || line.startsWith('  ⬢') ? 'text-terminal-cyan' :
+                          'text-terminal-text'
                   } whitespace-pre-wrap`}
               >
                 {line}
