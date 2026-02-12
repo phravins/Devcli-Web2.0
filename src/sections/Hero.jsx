@@ -92,7 +92,7 @@ export default function Hero() {
   return (
     <div
       ref={containerRef}
-      className="min-h-screen flex flex-col justify-center items-center px-4 sm:px-6 relative overflow-hidden bg-terminal-bg"
+      className="h-screen flex flex-col justify-center items-center px-4 sm:px-6 relative overflow-hidden bg-terminal-bg"
     >
       {/* 3D Background Scene */}
       <Scene3D mousePosition={mousePos} />
