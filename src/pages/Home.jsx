@@ -31,7 +31,7 @@ export default function Home() {
     const [showParticles, setShowParticles] = useState(true);
     const [isLoading, setIsLoading] = useState(true);
     const [showShortcuts, setShowShortcuts] = useState(false);
-    const { addToast } = useToast();
+    const { toasts, addToast, removeToast } = useToast();
 
     // Loading screen
     useEffect(() => {
@@ -110,7 +110,7 @@ export default function Home() {
             <InteractiveTerminal isOpen={isTerminalOpen} onClose={() => setIsTerminalOpen(false)} />
 
             {/* Toast Container */}
-            <ToastContainer />
+            <ToastContainer toasts={toasts} onRemove={removeToast} />
 
             {/* Keyboard Shortcuts Modal */}
             {showShortcuts && (
